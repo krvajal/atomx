@@ -1,3 +1,4 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
@@ -27,4 +28,52 @@ cc_test(
         "//atomx/xc",
         "@googletest//:gtest_main",
     ],
+)
+
+cc_library(
+    name = "test_util",
+    testonly = True,
+    hdrs = ["test_util.hpp"],
+    deps = [
+        "//atomx/atom",
+        "//atomx/core",
+        "//atomx/grid",
+        "//atomx/io",
+    ],
+)
+
+TEST_DEPS = [
+    ":test_util",
+    "//atomx/atom",
+    "//atomx/calc",
+    "//atomx/core",
+    "//atomx/grid",
+    "//atomx/io",
+    "//atomx/scf",
+    "//atomx/xc",
+    "@googletest//:gtest_main",
+]
+
+cc_test(
+    name = "exchange_test",
+    srcs = ["exchange_test.cpp"],
+    deps = TEST_DEPS,
+)
+
+cc_test(
+    name = "potential_test",
+    srcs = ["potential_test.cpp"],
+    deps = TEST_DEPS,
+)
+
+cc_test(
+    name = "golden_ld1_test",
+    srcs = ["golden_ld1_test.cpp"],
+    deps = TEST_DEPS,
+)
+
+cc_test(
+    name = "infrastructure_test",
+    srcs = ["infrastructure_test.cpp"],
+    deps = TEST_DEPS,
 )

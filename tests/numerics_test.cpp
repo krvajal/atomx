@@ -119,5 +119,103 @@ TEST(DiracSolver, HydrogenLikeMercury) {
   EXPECT_NEAR(sol.energy, exact, 1e-6 * std::abs(exact));
 }
 
+// Exact Dirac energy (Ry, without rest mass) of a hydrogen-like ion.
+double DiracEnergy(double z, double c, int n, int kappa) {
+  const double za = z / c;
+  const double gamma = std::sqrt(kappa * kappa - za * za);
+  const double d = n - std::abs(kappa) + gamma;
+  return 2.0 * c * c * (1.0 / std::sqrt(1.0 + za * za / (d * d)) - 1.0);
+}
+
+TEST(DiracSolver, HydrogenLikeFineStructure) {
+  // 2s1/2 and 2p1/2 are degenerate; 2p3/2 lies above. Covers both signs of
+  // kappa in the point-nucleus start at the origin.
+  const double z = 80.0;
+  const auto g = MakeGrid(z);
+  const atom::PointNucleus nucleus(z);
+  const double c = constants::kSpeedOfLight;
+  const auto solver = solvers::MakeDiracSolver(g, nucleus, c);
+  const Field v = nucleus.Potential(g);
+  struct State { int n, l; double j; int kappa; };
+  for (const State st : {State{2, 0, 0.5, -1}, State{2, 1, 0.5, 1},
+                         State{2, 1, 1.5, -2}, State{3, 2, 2.5, -3},
+                         State{3, 2, 1.5, 2}}) {
+    atom::Orbital o;
+    o.n = st.n;
+    o.l = st.l;
+    o.j = st.j;
+    ASSERT_EQ(o.Kappa(), st.kappa);
+    const auto sol = solver->Solve(o, v, -z * z / (st.n * st.n));
+    ASSERT_TRUE(sol.converged) << o.Label() << " j=" << o.j;
+    const double exact = DiracEnergy(z, c, st.n, st.kappa);
+    EXPECT_NEAR(sol.energy, exact, 1e-7 * std::abs(exact))
+        << o.Label() << " j=" << o.j;
+  }
+}
+
+TEST(DiracSolver, FiniteNucleusRaisesDeepLevels) {
+  // A finite nucleus weakens the attraction inside R: 1s moves up, a 2p3/2
+  // orbital (which vanishes at the origin) is essentially unaffected.
+  const double z = 92.0;
+  const auto g = MakeGrid(z);
+  const atom::PointNucleus point(z);
+  const atom::UniformSphereNucleus sphere(
+      z, atom::UniformSphereNucleus::DefaultRadius(92));
+  const double c = constants::kSpeedOfLight;
+  atom::Orbital s1;
+  s1.j = 0.5;
+  atom::Orbital p32;
+  p32.n = 2;
+  p32.l = 1;
+  p32.j = 1.5;
+  const auto ep = solvers::MakeDiracSolver(g, point, c);
+  const auto es = solvers::MakeDiracSolver(g, sphere, c);
+  const double s_point = ep->Solve(s1, point.Potential(g), -z * z).energy;
+  const double s_sphere = es->Solve(s1, sphere.Potential(g), -z * z).energy;
+  // U^91+ 1s finite-size shift: about 198 eV (Ry here)
+  EXPECT_NEAR((s_sphere - s_point) * constants::kRydbergToEv, 198.0, 10.0);
+  const double p_point = ep->Solve(p32, point.Potential(g), -z * z / 4).energy;
+  const double p_sphere = es->Solve(p32, sphere.Potential(g), -z * z / 4).energy;
+  EXPECT_NEAR(p_sphere, p_point, 1e-6 * std::abs(p_point));
+}
+
+TEST(SchrodingerSolver, RecoversFromPoorEnergyGuess) {
+  const auto g = MakeGrid();
+  const atom::PointNucleus nucleus(1.0);
+  const auto solver = solvers::MakeSchrodingerSolver(g, nucleus);
+  atom::Orbital o;
+  o.n = 3;
+  // far too deep: too few nodes at first
+  auto sol = solver->Solve(o, nucleus.Potential(g), -50.0);
+  ASSERT_TRUE(sol.converged);
+  EXPECT_NEAR(sol.energy, -1.0 / 9.0, 1e-8);
+  // far too shallow: too many nodes at first
+  sol = solver->Solve(o, nucleus.Potential(g), -1e-4);
+  ASSERT_TRUE(sol.converged);
+  EXPECT_NEAR(sol.energy, -1.0 / 9.0, 1e-8);
+}
+
+TEST(RadialSolvers, ReportFailureWhenTheGridIsTooSmall) {
+  // A 6s orbital of hydrogen does not fit in rmax = 5 bohr.
+  const auto g = grid::RadialGrid::Logarithmic(-7.0, 0.01, 5.0, 1.0);
+  const atom::PointNucleus nucleus(1.0);
+  atom::Orbital o;
+  o.n = 6;
+  o.j = 0.5;
+  const auto v = nucleus.Potential(g);
+  EXPECT_FALSE(solvers::MakeSchrodingerSolver(g, nucleus)->Solve(o, v, -1.0 / 36).converged);
+  EXPECT_FALSE(solvers::MakeDiracSolver(g, nucleus, constants::kSpeedOfLight)
+                   ->Solve(o, v, -1.0 / 36).converged);
+}
+
+TEST(RadialGrid, IsOddAndRejectsBadInput) {
+  const auto g = grid::RadialGrid::Logarithmic(-7.0, 0.0125, 60.0, 10.0);
+  EXPECT_EQ(g.size() % 2, 1u);
+  EXPECT_NEAR(g.r(0), std::exp(-7.0) / 10.0, 1e-18);
+  EXPECT_THROW(grid::RadialGrid::Logarithmic(-7.0, 0.0, 60.0, 1.0), Error);
+  const grid::RadialPoisson poisson(g);
+  EXPECT_THROW(poisson.Solve(2, 2, g.Zeros()), Error);  // needs nst > k+1
+}
+
 }  // namespace
 }  // namespace atomx
