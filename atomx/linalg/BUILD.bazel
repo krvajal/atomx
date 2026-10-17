@@ -1,0 +1,38 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+# Build with `--define slate=1` to add the SLATE backend (needs the prefix
+# installed by tools/build_slate.sh).
+config_setting(
+    name = "with_slate",
+    define_values = {"slate": "1"},
+)
+
+cc_library(
+    name = "linalg",
+    srcs = [
+        "lapack_solver.cpp",
+        "solver_factory.cpp",
+    ] + select({
+        ":with_slate": ["slate_solver.cpp"],
+        "//conditions:default": [],
+    }),
+    hdrs = [
+        "dense_matrix.hpp",
+        "linear_solver.hpp",
+    ] + select({
+        ":with_slate": ["slate_solver.hpp"],
+        "//conditions:default": [],
+    }),
+    defines = select({
+        ":with_slate": ["ATOMX_WITH_SLATE"],
+        "//conditions:default": [],
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//atomx/core",
+        "//third_party/lapack",
+    ] + select({
+        ":with_slate": ["@slate"],
+        "//conditions:default": [],
+    }),
+)

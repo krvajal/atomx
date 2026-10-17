@@ -1,0 +1,23 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "scf",
+    srcs = [
+        "energy.cpp",
+        "mixer.cpp",
+        "scf_driver.cpp",
+    ],
+    hdrs = [
+        "energy.hpp",
+        "mixer.hpp",
+        "scf_driver.hpp",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//atomx/atom",
+        "//atomx/core",
+        "//atomx/grid",
+        "//atomx/solvers",
+        "//atomx/xc",
+    ],
+)

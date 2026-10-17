@@ -1,0 +1,23 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "atom",
+    srcs = [
+        "configuration.cpp",
+        "nucleus.cpp",
+        "orbital.cpp",
+        "periodic_table.cpp",
+    ],
+    hdrs = [
+        "atom_state.hpp",
+        "configuration.hpp",
+        "nucleus.hpp",
+        "orbital.hpp",
+        "periodic_table.hpp",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//atomx/core",
+        "//atomx/grid",
+    ],
+)

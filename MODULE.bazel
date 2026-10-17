@@ -1,0 +1,17 @@
+module(name = "atomx", version = "0.1.0")
+
+bazel_dep(name = "rules_cc", version = "0.2.21")
+bazel_dep(name = "googletest", version = "1.17.0.bcr.2", dev_dependency = True)
+
+# SLATE backend (optional): the prefix built by tools/build_slate.sh. Only
+# fetched when a target depends on @slate, i.e. with --config=slate.
+new_local_repository = use_repo_rule(
+    "@bazel_tools//tools/build_defs/repo:local.bzl",
+    "new_local_repository",
+)
+
+new_local_repository(
+    name = "slate",
+    build_file = "//third_party/slate:slate.BUILD",
+    path = "third_party/install",
+)

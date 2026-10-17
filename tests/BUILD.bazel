@@ -1,0 +1,30 @@
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_test(
+    name = "numerics_test",
+    srcs = ["numerics_test.cpp"],
+    deps = [
+        "//atomx/atom",
+        "//atomx/core",
+        "//atomx/grid",
+        "//atomx/math",
+        "//atomx/solvers",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "regression_test",
+    srcs = ["regression_test.cpp"],
+    deps = [
+        "//atomx/atom",
+        "//atomx/calc",
+        "//atomx/core",
+        "//atomx/grid",
+        "//atomx/linalg",
+        "//atomx/scf",
+        "//atomx/solvers",
+        "//atomx/xc",
+        "@googletest//:gtest_main",
+    ],
+)

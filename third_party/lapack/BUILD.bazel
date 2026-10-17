@@ -1,0 +1,10 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+# System LAPACK/BLAS (OpenBLAS when installed, reference LAPACK otherwise).
+cc_library(
+    name = "lapack",
+    # Versioned names: work without the -dev packages, and resolve to OpenBLAS
+    # through Debian alternatives once it is installed.
+    linkopts = ["-l:liblapack.so.3", "-l:libblas.so.3"],
+    visibility = ["//visibility:public"],
+)

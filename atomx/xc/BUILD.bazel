@@ -1,0 +1,28 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "xc",
+    srcs = [
+        "exchange_operator.cpp",
+        "kli.cpp",
+        "lda.cpp",
+        "oep.cpp",
+        "xc_model.cpp",
+    ],
+    hdrs = [
+        "exchange_operator.hpp",
+        "kli.hpp",
+        "lda.hpp",
+        "oep.hpp",
+        "xc_model.hpp",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//atomx/atom",
+        "//atomx/core",
+        "//atomx/grid",
+        "//atomx/linalg",
+        "//atomx/math",
+        "//atomx/solvers",
+    ],
+)

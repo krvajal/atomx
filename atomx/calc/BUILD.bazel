@@ -1,0 +1,18 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "calc",
+    srcs = ["calculation.cpp"],
+    hdrs = ["calculation.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//atomx/atom",
+        "//atomx/core",
+        "//atomx/grid",
+        "//atomx/io",
+        "//atomx/linalg",
+        "//atomx/scf",
+        "//atomx/solvers",
+        "//atomx/xc",
+    ],
+)

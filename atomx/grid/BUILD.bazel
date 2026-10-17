@@ -1,0 +1,15 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+cc_library(
+    name = "grid",
+    srcs = [
+        "poisson.cpp",
+        "radial_grid.cpp",
+    ],
+    hdrs = [
+        "poisson.hpp",
+        "radial_grid.hpp",
+    ],
+    visibility = ["//visibility:public"],
+    deps = ["//atomx/core"],
+)
