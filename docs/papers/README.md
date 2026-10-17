@@ -1,7 +1,7 @@
 # Reference papers
 
-The PDFs are © American Physical Society and are not committed. Get local
-copies with:
+The PDFs are © American Physical Society, kept here for local reference.
+Do not publish them; if they are missing, get them with:
 
 ```
 docs/papers/fetch_papers.sh

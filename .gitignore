@@ -3,5 +3,3 @@
 /third_party/src/
 /third_party/build/
 
-# Papers are copyrighted; fetch them with docs/papers/fetch_papers.sh
-/docs/papers/*.pdf
