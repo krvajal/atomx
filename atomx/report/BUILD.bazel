@@ -2,8 +2,14 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
     name = "report",
-    srcs = ["report.cpp"],
-    hdrs = ["report.hpp"],
+    srcs = [
+        "data_writer.cpp",
+        "report.cpp",
+    ],
+    hdrs = [
+        "data_writer.hpp",
+        "report.hpp",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//atomx/atom",

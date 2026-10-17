@@ -60,6 +60,7 @@ ScfResult ScfDriver::Run(const atom::Configuration& configuration,
   int iterations = 0, failed = 0;
   double residual = 0.0;
   bool converged = false;
+  std::vector<double> history;
   Field v_hartree;
   SpinField rho;
   xc::XcContribution xc;
@@ -102,6 +103,7 @@ ScfResult ScfDriver::Run(const atom::Configuration& configuration,
 
     iterations = iter;
     residual = mix.residual;
+    history.push_back(mix.residual);
     failed = failures;
     if (observer_) observer_(iter, mix.residual);
     if (mix.converged) {
@@ -112,8 +114,10 @@ ScfResult ScfDriver::Run(const atom::Configuration& configuration,
 
   const EnergyTerms energies =
       ComputeEnergies(state, rho, v_nucleus, v_hartree, xc);
-  return ScfResult{std::move(state), std::move(rho), energies, std::move(xc),
-                   iterations, residual, converged, failed};
+  return ScfResult{std::move(state), std::move(rho), energies,
+                   std::move(xc),    iterations,     residual,
+                   converged,        failed,         v_nucleus,
+                   std::move(v_hartree), std::move(history)};
 }
 
 }  // namespace atomx::scf

@@ -33,7 +33,41 @@ Input is an ld1.x `&input` namelist, so ld1.x inputs run unchanged:
 /
 ```
 
-Extra key: `linear_solver = 'lapack' | 'slate' | 'slate-gpu'`.
+Extra keys:
+- `linear_solver = 'lapack' | 'slate' | 'slate-gpu'`
+- `output = 'dat' | 'json' | 'dat+json'` (default `'none'`), with ld1.x's
+  `prefix` (default `'atomx'`)
+
+### Output files and plots
+
+`output='dat'` writes gnuplot-ready columns with `#` headers:
+
+| File | Columns |
+|---|---|
+| `<prefix>.wfc` | r, r·R(r) of each orbital (large component); eigenvalues in the header |
+| `<prefix>.wfcs` | r, small components (Dirac only) |
+| `<prefix>.rho` | r, 4πr²n(r) per spin |
+| `<prefix>.pot` | r, V_nucleus, V_Hartree, V_xc per spin, V_KS per spin (Ry) |
+| `<prefix>.scf` | iteration, residual |
+
+`output='json'` writes all of this, plus energies and metadata, to
+`<prefix>.json` for Python. `tools/plot_atom.py` makes a six-panel figure
+from one or more runs:
+- orbitals;
+- radial density;
+- r·V_xc, which compares KLI, OEP and LDA on one axis;
+- potential terms;
+- level diagram;
+- SCF convergence.
+
+```
+uv venv .venv && uv pip install --python .venv/bin/python -r tools/requirements.txt
+.venv/bin/python tools/plot_atom.py ar_KLI.json ar_OEP.json ar_PZ.json -o ar.png
+.venv/bin/python tools/plot_atom.py hg.json --orbitals 1S+,2P-,2P+,6S+ -o hg.png
+```
+
+In gnuplot: `plot 'ne.wfc' u 1:2 w l t '1s', '' u 1:4 w l t '2p'` (with
+`set logscale x`).
 
 ### SLATE backend
 
@@ -57,10 +91,10 @@ atomx/xc        XcModel interface: LDA, KLI, OEP, CompositeXcModel;
 atomx/scf       ScfDriver, Anderson Mixer, energy terms
 atomx/io        namelist reader, CalculationInput
 atomx/calc      Calculation: the composition root
-atomx/report    ld1.x-style output
+atomx/report    ld1.x-style output; .dat/.json data writers
 apps/           atomx executable
 tests/          unit tests (analytic) and regression tests (published values)
-tools/          compare_ld1.py, build_slate.sh
+tools/          compare_ld1.py, build_slate.sh, plot_atom.py
 ```
 
 Every physics component is an interface injected into `ScfDriver`, so new

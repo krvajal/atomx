@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <memory>
+#include <vector>
 
 #include "atomx/atom/atom_state.hpp"
 #include "atomx/atom/configuration.hpp"
@@ -27,6 +28,10 @@ struct ScfResult {
   double residual = 0.0;
   bool converged = false;
   int failed_orbital_solves = 0;  // in the last iteration
+  // Potentials of the last iteration (Ry) and the residual of every step.
+  Field v_nucleus;
+  Field v_hartree;
+  std::vector<double> residual_history;
 };
 
 // Kohn-Sham self-consistency for a spherical atom. All physics is injected:

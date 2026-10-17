@@ -77,6 +77,9 @@ CalculationInput CalculationInput::FromNamelist(const Namelist& nl) {
   in.nuclear_radius = nl.GetDouble("rnucleus", 0.0);
   in.speed_of_light = nl.GetDouble("cau_fact", 0.0);
   in.linear_solver = Lower(nl.GetString("linear_solver", "lapack"));
+  in.output = Lower(nl.GetString("output", "none"));
+  in.prefix = nl.GetString("prefix", "atomx");
+  if (in.prefix.empty()) throw Error("prefix must not be empty");
 
   if (nl.GetInt("iswitch", 1) != 1) {
     throw Error("only all-electron calculations (iswitch=1) are supported");
@@ -84,7 +87,6 @@ CalculationInput CalculationInput::FromNamelist(const Namelist& nl) {
   if (nl.GetInt("isic", 0) != 0) throw Error("isic is not supported");
   if (nl.GetInt("latt", 0) != 0) throw Error("latt is not supported");
   // Accepted for compatibility with ld1.x inputs, no effect here.
-  (void)nl.GetString("prefix", "");
   (void)nl.GetString("file_charge", "");
   (void)nl.GetString("verbosity", "");
   return in;

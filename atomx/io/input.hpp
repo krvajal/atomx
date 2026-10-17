@@ -37,9 +37,14 @@ struct CalculationInput {
 
   std::string linear_solver = "lapack";  // or "slate"
 
+  // Data files for plotting: "dat" (gnuplot columns), "json", "dat+json" or
+  // "none"; written as <prefix>.wfc, <prefix>.json, ...
+  std::string output = "none";
+  std::string prefix = "atomx";
+
   // Reads &input (ld1.x names: zed/atom, config, rel, lsd, dft, xmin, dx, rmax,
   // beta, tr2, nucleus, rnucleus, cau_fact, rel_dist, title) plus the atomx
-  // extension `linear_solver`. Throws on unsupported settings.
+  // extensions `linear_solver` and `output` (with ld1.x's `prefix`). Throws on unsupported settings.
   static CalculationInput FromNamelist(const Namelist& nl);
 };
 

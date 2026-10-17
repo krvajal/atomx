@@ -77,3 +77,9 @@ cc_test(
     srcs = ["infrastructure_test.cpp"],
     deps = TEST_DEPS,
 )
+
+cc_test(
+    name = "data_writer_test",
+    srcs = ["data_writer_test.cpp"],
+    deps = TEST_DEPS + ["//atomx/report"],
+)
