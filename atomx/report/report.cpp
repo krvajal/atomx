@@ -89,10 +89,14 @@ void WriteReport(std::ostream& out, const calc::Calculation& calc,
   EnergyLine(out, "Encl", e.nuclear);
   EnergyLine(out, "Eh", e.hartree);
   EnergyLine(out, "Exc", e.xc);
-  std::snprintf(buf, sizeof buf,
-                "\n     virial discrepancy -(Ekin+Etot) = %12.6f mHa\n",
-                0.5 * e.VirialDiscrepancy() * 1000.0);
-  out << buf;
+  // The Levy-Perdew virial relation holds for non-relativistic kinetic
+  // energy only.
+  if (in.relativity == Relativity::kNone) {
+    std::snprintf(buf, sizeof buf,
+                  "\n     virial discrepancy -(Ekin+Etot) = %12.6f mHa\n",
+                  0.5 * e.VirialDiscrepancy() * 1000.0);
+    out << buf;
+  }
 }
 
 }  // namespace atomx::report

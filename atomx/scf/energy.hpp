@@ -14,7 +14,8 @@ struct EnergyTerms {
   double xc = 0.0;         // Exc
   double total = 0.0;
 
-  // Levy-Perdew virial discrepancy -(Ekin + Etot), zero for exact OEP.
+  // Levy-Perdew virial discrepancy -(Ekin + Etot), zero for the exact
+  // non-relativistic OEP; meaningless with a relativistic kinetic energy.
   double VirialDiscrepancy() const { return -(kinetic + total); }
 };
 

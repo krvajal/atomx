@@ -235,7 +235,9 @@ class JsonWriter final : public ResultWriter {
     j.Pair("nuclear", e.nuclear);
     j.Pair("hartree", e.hartree);
     j.Pair("xc", e.xc);
-    j.Pair("virial_discrepancy", e.VirialDiscrepancy());
+    if (in.relativity == Relativity::kNone) {  // not defined for Dirac
+      j.Pair("virial_discrepancy", e.VirialDiscrepancy());
+    }
     j.Close('}');
 
     j.Key("orbitals");

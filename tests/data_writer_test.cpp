@@ -75,7 +75,8 @@ TEST(DataWriter, JsonHasDiracSmallComponentsAndEnergies) {
   EXPECT_NE(json.find("\"relativity\":\"dirac\""), std::string::npos);
   EXPECT_NE(json.find("\"label\":\"2P-\""), std::string::npos);  // 2p1/2
   EXPECT_NE(json.find("\"small\":["), std::string::npos);
-  EXPECT_NE(json.find("\"virial_discrepancy\""), std::string::npos);
+  // the virial relation does not apply to the Dirac kinetic energy
+  EXPECT_EQ(json.find("\"virial_discrepancy\""), std::string::npos);
   EXPECT_NE(json.find("uniformly charged sphere"), std::string::npos);
 }
 
